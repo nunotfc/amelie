@@ -1,0 +1,8 @@
+node_modules/
+.env
+*.log
+temp_*
+.vscode/
+.idea/
+.wwebjs_auth/
+.wwebjs_cache/
