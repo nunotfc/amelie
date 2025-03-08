@@ -22,7 +22,7 @@ const fs                      = require('fs');
 const path                    = require('path');
 const { videoQueue, problemVideosQueue, getErrorMessageForUser, notificacoes } = require('./videoQueue');
 const HeartbeatSystem = require('./heartbeat');
-
+const readline = require('readline'); // Para capturar input do usuário
 
 dotenv.config();
 
@@ -330,15 +330,49 @@ const client = new Client({
 	    args: ['--no-sandbox', '--disable-setuid-sandbox']
     }
 });
-
-/**
- * Evento de geração do código QR para login
- */
-client.on('qr', qr => {
-    qrcode.generate(qr, {small: true});
-    logger.info('QR code gerado');
+//inicio
+// Configuração para leitura de entrada do usuário
+const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
 });
 
+// Variável para evitar múltiplas requisições de pairing code
+let pairingCodeRequested = false;
+
+// Perguntar a opção ao usuário
+rl.question('Digite 1 para gerar QR code ou 2 para código de pareamento: ', (opcao) => {
+    if (opcao === '1') {
+        client.on('qr', qr => {
+            qrcode.generate(qr, { small: true });
+            logger.info('QR code gerado');
+        });
+    } else if (opcao === '2') {
+        rl.question('Digite o número de telefone (ex: 351912345678, sem "+" ou espaços): ', async (phoneNumber) => {
+            logger.info(`Iniciando processo de pareamento para ${phoneNumber}`);            
+            // Validar o número básico
+            if (!/^\d{9,15}$/.test(phoneNumber)) {
+                logger.error('Número inválido fornecido pelo usuário.');
+                rl.close();
+                return;
+            }
+
+            try {
+                const pairingCode = await client.requestPairingCode(phoneNumber);
+                logger.info(`Código de pareamento para ${phoneNumber}: ${pairingCode || 'indisponível'}`);
+                pairingCodeRequested = true;
+            } catch (error) {
+                console.error('Erro ao gerar o código de pareamento:', error.message || error);
+                logger.error(`Erro no pareamento para ${phoneNumber}: ${error.message || error}`);
+            }
+            rl.close();
+        });
+    } else {
+        logger.info('Opção inválida fornecida pelo usuário.');
+        rl.close();
+    }
+});
+//fim
 /**
  * Inicializa a assistente virtual, carregando configurações
  * @async
