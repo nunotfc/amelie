@@ -1,6 +1,6 @@
-# Arquitetura do Amélie-Baileys
+# Arquitetura do Amélie
 
-Este documento descreve a arquitetura interna do projeto `amelie-baileys/src`, focando nos padrões de design adotados para garantir robustez, escalabilidade e facilidade de manutenção.
+Este documento descreve a arquitetura interna do projeto `amelie/src`, focando nos padrões de design adotados para garantir robustez, escalabilidade e facilidade de manutenção.
 
 ## 1. O Padrão Railway (Ferrovia.js)
 
