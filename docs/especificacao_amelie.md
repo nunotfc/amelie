@@ -28,14 +28,14 @@ graph TD
     end
 
     subgraph "Sistema Amélie (Node.js)"
-        WA[Interface WhatsApp <br/>(whatsapp-web.js)]
+        WA[Interface WhatsApp <br/>(@whiskeysockets/baileys)]
         GM[Gerenciador de Mensagens]
         FP[Fábrica de Processadores]
-        FILA[Gerenciador de Filas <br/>(Bull/Redis)]
+        FILA[Gerenciador de Filas <br/>(Better-Queue/Local)]
         PROC[Processadores Especializados]
         IA[Núcleo de IA <br/>(Google Gemini)]
         DB[Banco de Dados <br/>(NeDB)]
-        LOG[Sistema de Logs <br/>(Winston)]
+        LOG[Sistema de Logs <br/>(Pino + Winston)]
         CONF[Gerenciador de Configuração]
     end
 
@@ -48,14 +48,14 @@ graph TD
 
 Vamos conhecer meus principais colaboradores internos:
 
-*   **Interface WhatsApp (`whatsapp-web.js`):** São meus ouvidos e minha voz no WhatsApp. É por aqui que recebo suas mensagens e mídias, e também por onde envio minhas respostas.
+*   **Interface WhatsApp (`@whiskeysockets/baileys`):** São meus ouvidos e minha voz no WhatsApp. Conecto-me diretamente via WebSocket, o que me torna muito leve e rápida, sem precisar de navegador.
 *   **Gerenciador de Mensagens:** Meu centro de comando! Ele recebe tudo da Interface WhatsApp, entende o que precisa ser feito e coordena os próximos passos.
 *   **Fábrica de Processadores:** Meu organizador. Com base no que você enviou (texto, imagem, áudio, vídeo, comando), ele sabe exatamente qual especialista chamar.
 *   **Processadores Especializados:** Minhas equipes dedicadas! Tenho processadores para cada tipo de tarefa: um para analisar imagens, outro para vídeos, um para áudios, outro para documentos e um para entender comandos específicos. Eles são as mãos que colocam a acessibilidade em prática.
 *   **Núcleo de IA (`@google/generative-ai` - Gemini):** Meu coração criativo e analítico! Quando preciso descrever uma imagem complexa, entender nuances em um texto ou gerar um resumo inteligente, conto com a poderosa ajuda do Google Gemini.
-*   **Gerenciador de Filas (`Bull`/Redis):** Minha agenda eficiente. Algumas tarefas, como processar um vídeo longo, podem levar um tempinho. Para que você não fique esperando, eu coloco essas tarefas em uma fila organizada (usando Bull e Redis) e aviso assim que estiver pronto.
+*   **Gerenciador de Filas (`Better-Queue`):** Minha agenda eficiente. Algumas tarefas, como processar um vídeo longo, podem levar um tempinho. Para que você não fique esperando, eu coloco essas tarefas em uma fila organizada localmente e aviso assim que estiver pronto.
 *   **Banco de Dados (`NeDB`):** Minha memória persistente. Guardo aqui informações importantes como configurações, históricos (transações) e prompts personalizados, tudo de forma segura e local em arquivos NeDB.
-*   **Sistema de Logs (`Winston`):** Meu diário de bordo. Registro informações importantes sobre o que acontece aqui dentro para poder aprender e melhorar continuamente.
+*   **Sistema de Logs (`Pino/Winston`):** Meu diário de bordo. Registro informações importantes sobre o que acontece aqui dentro para poder aprender e melhorar continuamente.
 *   **Gerenciador de Configuração:** Onde consulto as regras e parâmetros para saber exatamente como devo operar em diferentes situações.
 
 É essa colaboração que me permite transformar suas solicitações em resultados acessíveis!
@@ -140,14 +140,13 @@ Seu feedback é incrivelmente valioso para mim. Suas ideias, sugestões e até m
 Para os mais curiosos sobre minhas engrenagens, aqui estão as principais tecnologias que me dão vida:
 
 *   **Plataforma:** Node.js
-*   **Interface WhatsApp:** whatsapp-web.js (utilizando Puppeteer)
+*   **Interface WhatsApp:** @whiskeysockets/baileys
 *   **Inteligência Artificial:** Google Gemini (@google/generative-ai)
-*   **Gerenciamento de Filas:** Bull (com Redis como backend)
-*   **Banco de Dados:** NeDB / NeDB Promises (local, baseado em arquivos)
-*   **Gerenciamento de Processos:** PM2 (recomendado para produção)
-*   **Logging:** Winston
+*   **Gerenciamento de Filas:** Better-Queue (local)
+*   **Banco de Dados:** NeDB (local, baseado em arquivos)
+*   **Logging:** Pino & Winston
 *   **Validação:** Joi
-*   **Utilitários Diversos:** dotenv, Moment Timezone, Node Cache, Neverthrow, Bottleneck, etc.
+*   **Utilitários Diversos:** Ferrovia.js, dotenv, Moment Timezone, Node Cache, Bottleneck
 *   **Testes:** Jest
 
 Espero que esta visão geral tenha ajudado a entender um pouco melhor quem eu sou e como trabalho com paixão para promover a acessibilidade. Se tiver qualquer dúvida, é só chamar! 😊

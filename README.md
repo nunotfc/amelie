@@ -1,5 +1,11 @@
 # Olá! Eu sou a Amélie 👋
 
+![Node.js](https://img.shields.io/badge/Node.js-v18%2B-green?style=flat-square&logo=node.js&logoColor=white)
+![Google Gemini](https://img.shields.io/badge/Powered%20by-Gemini%202.0-blue?style=flat-square&logo=google-gemini&logoColor=white)
+![WhatsApp](https://img.shields.io/badge/WhatsApp-Baileys-25D366?style=flat-square&logo=whatsapp&logoColor=white)
+![License](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)
+![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)
+
 Prazer em conhecer você! Sou uma assistente de IA multimídia acessível integrada ao WhatsApp, criada e idealizada pela Belle Utsch. Minha missão é tornar o WhatsApp mais acessível para todas as pessoas, especialmente aquelas com deficiência visual.
 
 ## Como posso te ajudar? 🤝

@@ -24,13 +24,12 @@ Este documento descreve a estrutura e o tom planejados para a especificação t�
                 U[Usuário]
             end
 
-            subgraph "Sistema Amélie (Node.js)"
-                WA[Interface WhatsApp <br/>(whatsapp-web.js)]
-                GM[Gerenciador de Mensagens]
-                FP[Fábrica de Processadores]
-                FILA[Gerenciador de Filas <br/>(Bull/Redis)]
-                PROC[Processadores Especializados]
-                IA[Núcleo de IA <br/>(Google Gemini)]
+                subgraph "Sistema Amélie (Node.js)"
+                    WA[Interface WhatsApp <br/>(Baileys)]
+                    GM[Gerenciador de Mensagens]
+                    FP[Fábrica de Processadores]
+                    FILA[Gerenciador de Filas <br/>(Better-Queue)]
+                    PROC[Processadores Especializados]                IA[Núcleo de IA <br/>(Google Gemini)]
                 DB[Banco de Dados <br/>(NeDB)]
                 LOG[Sistema de Logs <br/>(Winston)]
                 CONF[Gerenciador de Configuração]
