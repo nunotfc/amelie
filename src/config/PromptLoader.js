@@ -12,8 +12,7 @@ const carregarMarkdown = (filePath) => {
     const secoes = {};
     let secaoAtual = '';
     
-    conteudo.split('
-').forEach(linha => {
+    conteudo.split('\n').forEach(linha => {
       if (linha.startsWith('# ')) {
         secaoAtual = linha.replace('# ', '').trim();
         secoes[secaoAtual] = [];
@@ -24,8 +23,7 @@ const carregarMarkdown = (filePath) => {
 
     // Join lines and trim
     Object.keys(secoes).forEach(key => {
-      secoes[key] = secoes[key].join('
-').trim();
+      secoes[key] = secoes[key].join('\n').trim();
     });
 
     return secoes;
