@@ -21,7 +21,7 @@ const ProcessadorAudioAI = require('./processadores/ProcessadorAudioAI');
 const ProcessadorDocumentoAI = require('./processadores/ProcessadorDocumentoAI');
 
 // --- Constantes ---
-const DEFAULT_MODEL = "gemini-3-flash-preview";
+const DEFAULT_MODEL = "gemini-2.5-flash-lite";
 const CACHE_TTL_SEGUNDOS = 3600;
 const CACHE_MAX_ENTRADAS = 500;
 const RATE_LIMITER_MAX_CONCORRENTE = 20;

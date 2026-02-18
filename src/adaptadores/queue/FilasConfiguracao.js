@@ -80,7 +80,7 @@ const FilasConfiguracao = {
         topK: config.topK || 1,
         topP: config.topP || 0.95,
         maxOutputTokens: config.maxOutputTokens || 1024,
-        model: "gemini-2.0-flash",
+        model: config.model,
         systemInstructions: promptPersonalizado, // Retorna SÓ o prompt personalizado (ou null)
         instrucaoPadraoMidia: instrucaoPadraoMidia, // Retorna a instrução padrão separadamente
         modoDescricao,
@@ -95,7 +95,6 @@ const FilasConfiguracao = {
         topK: 1,
         topP: 0.95,
         maxOutputTokens: 1024,
-        model: "gemini-2.0-flash",
         modoDescricao: 'curto'
       });
     }

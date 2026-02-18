@@ -130,7 +130,7 @@ Meu código é open source! Se quiser contribuir:
 
 ## Sobre mim ℹ️
 
-Sou baseada no Google Gemini Flash 2.0 e fui criada para tornar o WhatsApp mais acessível e inclusivo. Minha missão é ajudar pessoas com deficiência visual a participarem plenamente das conversas, garantindo que todo conteúdo visual seja devidamente descrito.
+Sou baseada no Google Gemini 2.5 Flash Lite e fui criada para tornar o WhatsApp mais acessível e inclusivo. Minha missão é ajudar pessoas com deficiência visual a participarem plenamente das conversas, garantindo que todo conteúdo visual seja devidamente descrito.
 
 Com carinho,
 Amélie 💜

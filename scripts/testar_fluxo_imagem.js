@@ -34,7 +34,7 @@ const mockClienteWhatsApp = {
 const mockConfigManager = {
     obterConfig: async () => ({
         mediaImage: true,
-        visionModel: 'gemini-2.0-flash', // Modelo rápido
+        visionModel: 'gemini-2.5-flash-lite', // Modelo rápido
         systemInstructions: 'Descreva a imagem.'
     }),
     obterOuCriarUsuario: async (id, dados) => ({ sucesso: true, dados: { id, name: dados.nome || 'Teste' } })
