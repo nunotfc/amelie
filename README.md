@@ -25,6 +25,16 @@ Para falar comigo:
 2. Me envie uma mensagem no WhatsApp
 3. Use o comando `.ajuda` para ver todas as minhas funcionalidades
 
+## Configuração de Login (Pairing Code vs QR Code) 🔐
+
+Você pode conectar a Amélie ao WhatsApp de duas formas:
+
+1.  **QR Code (Padrão):** O QR Code será gerado no terminal. Basta escanear com o seu WhatsApp em "Aparelhos Conectados".
+2.  **Pairing Code (Código de Login):** Ideal para quando você não tem acesso fácil ao terminal ou quer logar remotamente.
+    *   No seu arquivo `.env`, adicione a variável `MOBILE_NUMBER=55319XXXXXXXX` (com código do país e DDD).
+    *   Ao iniciar, a Amélie exibirá um código de 8 dígitos no log/terminal.
+    *   No WhatsApp, vá em "Aparelhos Conectados" > "Conectar com número de telefone" e insira o código exibido.
+
 ## Meus comandos 🎯
 
 Use um ponto (.) antes de cada comando, sem espaço. Por exemplo: `.ajuda`

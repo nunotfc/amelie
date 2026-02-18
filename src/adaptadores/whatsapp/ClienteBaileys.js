@@ -50,10 +50,27 @@ const criarClienteBaileys = (registrador, opcoes = {}) => {
 
         sock.ev.on('creds.update', saveCreds);
 
-        sock.ev.on('connection.update', (update) => {
+        sock.ev.on('connection.update', async (update) => {
             const { connection, lastDisconnect, qr } = update;
 
-            if (qr) {
+            // Lógica de Pairing Code
+            if (!sock.authState.creds.registered && process.env.MOBILE_NUMBER && !pronto) {
+                try {
+                    const numeroTelefone = process.env.MOBILE_NUMBER;
+                    registrador.info(`[Baileys] Solicitando Código de Emparelhamento para: ${numeroTelefone}`);
+                    
+                    // Pequeno delay para garantir que o socket está pronto para a requisição
+                    await new Promise(r => setTimeout(r, 2000));
+                    
+                    const code = await sock.requestPairingCode(numeroTelefone);
+                    console.log('\x1b[32m%s\x1b[0m', `\n\n[CÓDIGO DE LOGIN AMÉLIE]: ${code}\n\n`);
+                    registrador.info(`[Baileys] CÓDIGO DE LOGIN: ${code}`);
+                } catch (e) {
+                    registrador.error(`[Baileys] Erro ao solicitar pairing code: ${e.message}. Tentando QR Code...`);
+                    if (qr) qrcode.generate(qr, { small: true });
+                }
+            } else if (qr) {
+                // Fallback para QR Code se não houver MOBILE_NUMBER ou se já tentou pairing
                 qrcode.generate(qr, { small: true });
                 registrador.info('[Baileys] QR Code gerado.');
                 eventos.emit('qr', qr);
