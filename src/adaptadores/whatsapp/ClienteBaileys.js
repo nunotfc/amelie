@@ -31,6 +31,7 @@ const criarClienteBaileys = (registrador, opcoes = {}) => {
     let pronto = false;
     let pairingCodeSolicitado = false;
     let geracaoConexao = 0;
+    let credenciaisAtualizadas = false; // true após qualquer creds.update (QR ou pairing code aceito)
 
     /**
      * Inicializa a conexão com o WhatsApp
@@ -49,8 +50,9 @@ const criarClienteBaileys = (registrador, opcoes = {}) => {
         const { state, saveCreds } = await useMultiFileAuthState(diretorioAuth);
         const { version } = await fetchLatestBaileysVersion();
 
-        // Avalia aqui, com o estado já carregado do disco
-        const precisaAutenticar = !state.creds.registered;
+        // Precisa autenticar apenas se não há credenciais registradas E nenhum
+        // creds.update ocorreu nesta sessão (QR escaneado ou pairing code aceito)
+        const precisaAutenticar = !state.creds.registered && !credenciaisAtualizadas;
 
         sock = makeWASocket({
             version,
@@ -63,7 +65,10 @@ const criarClienteBaileys = (registrador, opcoes = {}) => {
             browser: ['Amélie', 'MacOS', '3.0.0']
         });
 
-        sock.ev.on('creds.update', saveCreds);
+        sock.ev.on('creds.update', () => {
+            credenciaisAtualizadas = true; // QR escaneado ou pairing code aceito
+            saveCreds();
+        });
 
         sock.ev.on('connection.update', async (update) => {
             if (geracao !== geracaoConexao) return; // evento de socket obsoleto, ignorar
@@ -106,6 +111,7 @@ const criarClienteBaileys = (registrador, opcoes = {}) => {
                 } else {
                     // Sessão encerrada pelo WhatsApp — limpar credenciais e forçar novo login
                     registrador.warn('[Baileys] Sessão encerrada (loggedOut). Limpando credenciais para novo login...');
+                    credenciaisAtualizadas = false; // reset: próxima geração precisará autenticar
                     const fs = require('fs');
                     if (fs.existsSync(diretorioAuth)) {
                         fs.rmSync(diretorioAuth, { recursive: true });
