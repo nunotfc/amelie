@@ -28,4 +28,5 @@ src/__tests__/*
 .cline*
 .roo*
 memory-bank/*
+CLAUDE.md
 *.bak

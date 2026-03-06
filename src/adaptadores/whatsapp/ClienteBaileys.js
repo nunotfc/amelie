@@ -29,11 +29,13 @@ const criarClienteBaileys = (registrador, opcoes = {}) => {
     
     let sock = null;
     let pronto = false;
+    let pairingCodeSolicitado = false;
 
     /**
      * Inicializa a conexão com o WhatsApp
      */
     const inicializar = async () => {
+        pairingCodeSolicitado = false;
         const { state, saveCreds } = await useMultiFileAuthState(diretorioAuth);
         const { version } = await fetchLatestBaileysVersion();
 
@@ -53,8 +55,9 @@ const criarClienteBaileys = (registrador, opcoes = {}) => {
         sock.ev.on('connection.update', async (update) => {
             const { connection, lastDisconnect, qr } = update;
 
-            // Lógica de Pairing Code
-            if (!sock.authState.creds.registered && process.env.MOBILE_NUMBER && !pronto) {
+            // Lógica de Pairing Code — flag evita requisições duplicadas
+            if (!sock.authState.creds.registered && process.env.MOBILE_NUMBER && !pronto && !pairingCodeSolicitado) {
+                pairingCodeSolicitado = true;
                 try {
                     const numeroTelefone = process.env.MOBILE_NUMBER;
                     registrador.info(`[Baileys] Solicitando Código de Emparelhamento para: ${numeroTelefone}`);
@@ -77,10 +80,21 @@ const criarClienteBaileys = (registrador, opcoes = {}) => {
             }
 
             if (connection === 'close') {
-                const shouldReconnect = lastDisconnect.error?.output?.statusCode !== DisconnectReason.loggedOut;
+                const statusCode = lastDisconnect?.error?.output?.statusCode;
+                const shouldReconnect = statusCode !== DisconnectReason.loggedOut;
                 registrador.error(`[Baileys] Conexão fechada. Reconectar: ${shouldReconnect}`);
                 pronto = false;
-                if (shouldReconnect) inicializar();
+                if (shouldReconnect) {
+                    inicializar();
+                } else {
+                    // Sessão encerrada pelo WhatsApp — limpar credenciais e forçar novo login
+                    registrador.warn('[Baileys] Sessão encerrada (loggedOut). Limpando credenciais para novo login...');
+                    const fs = require('fs');
+                    if (fs.existsSync(diretorioAuth)) {
+                        fs.rmSync(diretorioAuth, { recursive: true });
+                    }
+                    inicializar();
+                }
             } else if (connection === 'open') {
                 registrador.info('[Baileys] Conexão aberta com sucesso.');
                 pronto = true;
