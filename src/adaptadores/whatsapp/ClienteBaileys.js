@@ -30,12 +30,14 @@ const criarClienteBaileys = (registrador, opcoes = {}) => {
     let sock = null;
     let pronto = false;
     let pairingCodeSolicitado = false;
+    let geracaoConexao = 0;
 
     /**
      * Inicializa a conexão com o WhatsApp
      */
     const inicializar = async () => {
         pairingCodeSolicitado = false;
+        const geracao = ++geracaoConexao;
         const { state, saveCreds } = await useMultiFileAuthState(diretorioAuth);
         const { version } = await fetchLatestBaileysVersion();
 
@@ -53,6 +55,7 @@ const criarClienteBaileys = (registrador, opcoes = {}) => {
         sock.ev.on('creds.update', saveCreds);
 
         sock.ev.on('connection.update', async (update) => {
+            if (geracao !== geracaoConexao) return; // evento de socket obsoleto, ignorar
             const { connection, lastDisconnect, qr } = update;
 
             // Lógica de Pairing Code — flag evita requisições duplicadas
