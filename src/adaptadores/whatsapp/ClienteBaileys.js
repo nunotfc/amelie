@@ -38,8 +38,19 @@ const criarClienteBaileys = (registrador, opcoes = {}) => {
     const inicializar = async () => {
         pairingCodeSolicitado = false;
         const geracao = ++geracaoConexao;
+
+        // Em reconexões (não na primeira chamada), aguarda o saveCreds() do socket
+        // anterior terminar de gravar no disco antes de carregar o estado
+        if (geracao > 1) {
+            await new Promise(r => setTimeout(r, 1000));
+            if (geracao !== geracaoConexao) return; // geração superada durante a espera
+        }
+
         const { state, saveCreds } = await useMultiFileAuthState(diretorioAuth);
         const { version } = await fetchLatestBaileysVersion();
+
+        // Avalia aqui, com o estado já carregado do disco
+        const precisaAutenticar = !state.creds.registered;
 
         sock = makeWASocket({
             version,
@@ -58,19 +69,18 @@ const criarClienteBaileys = (registrador, opcoes = {}) => {
             if (geracao !== geracaoConexao) return; // evento de socket obsoleto, ignorar
             const { connection, lastDisconnect, qr } = update;
 
-            // Lógica de Pairing Code — flag evita requisições duplicadas
-            if (!sock.authState.creds.registered && process.env.MOBILE_NUMBER && !pronto && !pairingCodeSolicitado) {
+            // Só solicita pairing code se realmente não há credenciais registradas
+            if (precisaAutenticar && process.env.MOBILE_NUMBER && !pronto && !pairingCodeSolicitado) {
                 pairingCodeSolicitado = true;
                 try {
                     const numeroTelefone = process.env.MOBILE_NUMBER;
                     registrador.info(`[Baileys] Solicitando Código de Emparelhamento para: ${numeroTelefone}`);
-                    
+
                     // Pequeno delay para garantir que o socket está pronto para a requisição
                     await new Promise(r => setTimeout(r, 2000));
 
-                    // Se durante a espera a conexão já abriu (ex: credenciais de QR salvas)
-                    // ou a geração mudou, não faz sentido pedir pairing code
-                    if (pronto || geracao !== geracaoConexao || sock.authState.creds.registered) return;
+                    // Se durante a espera a conexão já abriu ou a geração mudou, abortar
+                    if (pronto || geracao !== geracaoConexao) return;
 
                     const code = await sock.requestPairingCode(numeroTelefone);
                     console.log('\x1b[32m%s\x1b[0m', `\n\n[CÓDIGO DE LOGIN AMÉLIE]: ${code}\n\n`);
@@ -79,8 +89,8 @@ const criarClienteBaileys = (registrador, opcoes = {}) => {
                     registrador.error(`[Baileys] Erro ao solicitar pairing code: ${e.message}. Tentando QR Code...`);
                     if (qr) qrcode.generate(qr, { small: true });
                 }
-            } else if (qr) {
-                // Fallback para QR Code se não houver MOBILE_NUMBER ou se já tentou pairing
+            } else if (qr && precisaAutenticar) {
+                // QR Code apenas quando realmente precisa autenticar
                 qrcode.generate(qr, { small: true });
                 registrador.info('[Baileys] QR Code gerado.');
                 eventos.emit('qr', qr);
