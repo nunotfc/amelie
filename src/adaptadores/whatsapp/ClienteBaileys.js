@@ -67,7 +67,11 @@ const criarClienteBaileys = (registrador, opcoes = {}) => {
                     
                     // Pequeno delay para garantir que o socket está pronto para a requisição
                     await new Promise(r => setTimeout(r, 2000));
-                    
+
+                    // Se durante a espera a conexão já abriu (ex: credenciais de QR salvas)
+                    // ou a geração mudou, não faz sentido pedir pairing code
+                    if (pronto || geracao !== geracaoConexao || sock.authState.creds.registered) return;
+
                     const code = await sock.requestPairingCode(numeroTelefone);
                     console.log('\x1b[32m%s\x1b[0m', `\n\n[CÓDIGO DE LOGIN AMÉLIE]: ${code}\n\n`);
                     registrador.info(`[Baileys] CÓDIGO DE LOGIN: ${code}`);
