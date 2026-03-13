@@ -206,7 +206,8 @@ Module.prototype.require = function(id) {
     // ------------------------------------------------------------------------
     // PATCH 3: GerenciadorMensagens - Desabilitar auto-saída de grupos
     // ------------------------------------------------------------------------
-    if (modulePath.includes('GerenciadorMensagens')) {
+    // Só aplica para GerenciadorMensagens.js, NÃO para AdaptadorGerenciadorMensagens.js
+    if (modulePath.includes('GerenciadorMensagens') && !modulePath.includes('Adaptador')) {
         if (typeof module === 'function' && !module.__patchedByOverrides) {
             const originalCriar = module;
 
