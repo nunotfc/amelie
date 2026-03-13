@@ -293,6 +293,45 @@ Module.prototype.require = function(id) {
         }
     }
 
+    // ------------------------------------------------------------------------
+    // PATCH 6: GerenciadorAI - Substituir DEFAULT_MODEL hardcoded
+    // ------------------------------------------------------------------------
+    if (modulePath.includes('GerenciadorAI') || modulePath.includes('adaptadores/ai/GerenciadorAI')) {
+        const resolvedPath = Module._resolveFilename(id, this);
+        const originalCode = fs.readFileSync(resolvedPath, 'utf8');
+
+        // Substituir: const DEFAULT_MODEL = "gemini-2.5-flash-lite";
+        // Por: const DEFAULT_MODEL = process.env.AI_MODEL || "gemini-2.5-flash-lite";
+        const patchedCode = originalCode.replace(
+            /const DEFAULT_MODEL = "gemini[^"]*";/,
+            'const DEFAULT_MODEL = process.env.AI_MODEL || "gemini-2.5-flash-lite";'
+        );
+
+        if (originalCode !== patchedCode) {
+            const mod = new Module(resolvedPath, this);
+            mod.filename = resolvedPath;
+            mod.paths = Module._nodeModulePaths(resolvedPath);
+
+            const script = new vm.Script(patchedCode, { filename: resolvedPath });
+            script.runInNewContext({
+                module: mod,
+                exports: mod.exports,
+                require: mod.require.bind(mod),
+                __filename: resolvedPath,
+                __dirname: require('path').dirname(resolvedPath),
+                process,
+                Buffer,
+                console,
+                global
+            });
+
+            this.exports = mod.exports;
+            console.log('[Overrides/AIModel] GerenciadorAI patchado com AI_MODEL=', process.env.AI_MODEL || 'gemini-2.5-flash-lite');
+            require.cache[resolvedPath] = mod;
+            return mod.exports;
+        }
+    }
+
 
     return module;
 };
