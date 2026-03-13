@@ -27,6 +27,7 @@ jsconfig.json
 src/__tests__/*
 .cline*
 .roo*
+.claude*
 memory-bank/*
 CLAUDE.md
 *.bak
