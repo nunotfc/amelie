@@ -332,6 +332,37 @@ Module.prototype.require = function(id) {
         }
     }
 
+    // ------------------------------------------------------------------------
+    // PATCH 7: ProcessadorAudioAI - Remover timestamps SRT da transcrição
+    // ------------------------------------------------------------------------
+    if (modulePath.includes('ProcessadorAudioAI')) {
+        if (!module.__patchedByOverrides) {
+            const originalClass = module.default || module;
+
+            // Patchar o método processarAudio
+            if (originalClass.prototype && originalClass.prototype.processarAudio) {
+                const originalProcessarAudio = originalClass.prototype.processarAudio;
+
+                originalClass.prototype.processarAudio = async function(audioData, audioId, config) {
+                    const resultado = await originalProcessarAudio.call(this, audioData, audioId, config);
+
+                    // Remover timestamps SRT/VTT pós-processamento
+                    if (resultado.sucesso && resultado.dados) {
+                        resultado.dados = resultado.dados
+                            .replace(/\d{2}:\d{2}:\d{2}\.\d{3}\s*-->\s*\d{2}:\d{2}:\d{2}\.\d{3}/g, '')
+                            .replace(/\n{3,}/g, '\n\n')
+                            .trim();
+                    }
+
+                    return resultado;
+                };
+
+                module.__patchedByOverrides = true;
+                console.log('[Overrides/Audio] ProcessadorAudioAI patchado (timestamps removidos)');
+            }
+        }
+    }
+
 
     return module;
 };
