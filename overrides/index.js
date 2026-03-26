@@ -103,9 +103,9 @@ Module.prototype.require = function(id) {
             mod.filename = resolvedPath;
             mod.paths = Module._nodeModulePaths(resolvedPath);
 
-            // Compilar e executar o código modificado
+            // Compilar e executar o código modificado no contexto GLOBAL (para ter setTimeout, etc)
             const script = new vm.Script(finalCode, { filename: resolvedPath });
-            const result = script.runInNewContext({
+            const context = {
                 module: mod,
                 exports: mod.exports,
                 require: mod.require.bind(mod),
@@ -114,8 +114,18 @@ Module.prototype.require = function(id) {
                 process,
                 Buffer,
                 console,
-                global
-            });
+                global,
+                setTimeout,
+                clearTimeout,
+                setInterval,
+                clearInterval,
+                setImmediate,
+                clearImmediate,
+                queueMicrotask
+            };
+
+            // Executar no contexto com todas as funções globais
+            const result = script.runInNewContext(context);
 
             this.exports = mod.exports;
             console.log('[Overrides/FileSize] ProcessadorVideo patchado com MAX_FILE_SIZE_MB=', process.env.MAX_FILE_SIZE_MB || 20);
@@ -313,7 +323,7 @@ Module.prototype.require = function(id) {
             mod.paths = Module._nodeModulePaths(resolvedPath);
 
             const script = new vm.Script(patchedCode, { filename: resolvedPath });
-            script.runInNewContext({
+            const context = {
                 module: mod,
                 exports: mod.exports,
                 require: mod.require.bind(mod),
@@ -322,8 +332,17 @@ Module.prototype.require = function(id) {
                 process,
                 Buffer,
                 console,
-                global
-            });
+                global,
+                setTimeout,
+                clearTimeout,
+                setInterval,
+                clearInterval,
+                setImmediate,
+                clearImmediate,
+                queueMicrotask
+            };
+
+            script.runInNewContext(context);
 
             this.exports = mod.exports;
             console.log('[Overrides/AIModel] GerenciadorAI patchado com AI_MODEL=', process.env.AI_MODEL || 'gemini-2.5-flash-lite');
@@ -344,6 +363,11 @@ Module.prototype.require = function(id) {
                 const originalProcessarAudio = originalClass.prototype.processarAudio;
 
                 originalClass.prototype.processarAudio = async function(audioData, audioId, config) {
+                    // CORREÇÃO: Usar systemInstructions (plural) para funcionar com obterModeloGenerico
+                    const instrucaoAudio = require('../src/config/InstrucoesSistema').obterInstrucaoAudio();
+                    config.systemInstructions = config.systemInstruction || instrucaoAudio;
+                    delete config.systemInstruction; // Remover singular para não confundir
+
                     const resultado = await originalProcessarAudio.call(this, audioData, audioId, config);
 
                     // Remover timestamps SRT/VTT pós-processamento
@@ -358,7 +382,7 @@ Module.prototype.require = function(id) {
                 };
 
                 module.__patchedByOverrides = true;
-                console.log('[Overrides/Audio] ProcessadorAudioAI patchado (timestamps removidos)');
+                console.log('[Overrides/Audio] ProcessadorAudioAI patchado (bug systemInstruction corrigido + timestamps removidos)');
             }
         }
     }
